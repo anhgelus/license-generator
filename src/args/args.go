@@ -78,7 +78,7 @@ var (
 		Description:   "Show the help",
 	}
 	argLists     = [4]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg}
-	infoArgLists = [1]InfoArgument{HelpArg}
+	infoArgLists = [0]InfoArgument{}
 )
 
 // GenerateParameter Generate the full parameter
@@ -95,7 +95,7 @@ func (arg InfoArgument) GenerateText() string {
 }
 
 // AssignValueToArguments Assign the value of the argument passed through the cli inside the Arguments struct
-func (arg Arguments) AssignValueToArguments(argument *AvailableArgument, v string) error {
+func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v string) error {
 	switch argument.Parameter {
 	case "name":
 		arg.AppName = v
@@ -135,5 +135,6 @@ func helpText() string {
 	for _, arg := range infoArgLists {
 		str = str + arg.GenerateParameter() + " - " + arg.Description + "\n"
 	}
+	str = str + "-h - Show the help"
 	return str
 }
