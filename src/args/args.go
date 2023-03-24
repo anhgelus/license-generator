@@ -11,6 +11,7 @@ type Arguments struct {
 	Year        string
 	Authors     []string
 	Question    bool
+	Info        bool
 }
 
 type License string

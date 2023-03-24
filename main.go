@@ -15,6 +15,9 @@ var staticContent embed.FS
 func main() {
 	args.GenerateLicenseMap()
 	arg := args.ParseCliArgs()
+	if arg.Info {
+		os.Exit(0)
+	}
 	arg.HandleArgs()
 
 	l := findLicense(arg.LicenseType)

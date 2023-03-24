@@ -12,11 +12,18 @@ func ParseCliArgs() *Arguments {
 	if len(args) < 2 {
 		return &Arguments{Question: true}
 	}
-	arguments := Arguments{}
+	arguments := Arguments{Info: false}
 	l := 0
+	tb := false
+
+ar:
 	for i, arg := range args {
 		if i == 0 {
 			continue
+		}
+		if arg == "-h" {
+			println(HelpArg.textGenerator())
+			tb = true
 		}
 		for _, av := range argLists {
 			if arg != av.GenerateParameter() {
@@ -25,9 +32,23 @@ func ParseCliArgs() *Arguments {
 			arguments.assignValueToArguments(&av, args[i+1])
 			l++
 		}
+		for _, av := range infoArgLists {
+			if arg != av.GenerateParameter() {
+				continue
+			}
+			println(av.textGenerator())
+			l++
+			tb = true
+		}
+		if tb {
+			break ar
+		}
 	}
 	if l != 4 {
 		arguments.Question = true
+	}
+	if tb {
+		arguments.Info = true
 	}
 	return &arguments
 }
