@@ -18,11 +18,10 @@ Now you can build the project
 $ go build .
 ```
 
-Put the binary inside your `/usr/bin` and give you the right to execute it
+Use the script `setup.sh` to install the binaries!
 
 ```bash
-$ sudo cp ./license-generator /usr/bin/license-generator
-$ sudo chmod +x /usr/bin/license-generator
+$ sh setup.sh
 ```
 
 And use it!
