@@ -17,11 +17,13 @@ type Arguments struct {
 type License string
 
 const (
-	gpl  License = "GPLv3"
-	agpl License = "AGPLv3"
-	lgpl License = "LGPLv3"
-	mpl  License = "MPL"
-	mit  License = "MIT"
+	gpl     License = "GPLv3"
+	agpl    License = "AGPLv3"
+	lgpl    License = "LGPLv3"
+	mpl     License = "MPL"
+	mit     License = "MIT"
+	bsd     License = "BSD"
+	freebsd License = "FreeBSD"
 )
 
 var (
@@ -34,6 +36,8 @@ func GenerateLicenseMap() {
 	licenseMap["lgpl"] = lgpl
 	licenseMap["mpl"] = mpl
 	licenseMap["mit"] = mit
+	licenseMap["bsd"] = bsd
+	licenseMap["freebsd"] = freebsd
 }
 
 func GetLicense(name string) License {
