@@ -68,14 +68,11 @@ func GetLicenseConfigs(path string) ([]LicenseConfig, error) {
 }
 
 func (license *LicenseConfig) AddToMap(contextPath string) {
-	println("Path:", license.Path)
 	args.AddLicense(license.ToLicense(contextPath), license.Identifier)
 }
 
 func AddLicensesToMap(licenses []LicenseConfig, contextPath string) {
-	println("F:", licenses[0].Path)
 	for _, license := range licenses {
-		println("P:", license.Path)
 		license.AddToMap(contextPath)
 	}
 }

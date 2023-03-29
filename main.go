@@ -25,11 +25,9 @@ func main() {
 		utils.HandleError(err)
 		contextPath, err := os.Getwd()
 		utils.HandleError(err)
-		println(contextPath)
-		for _, license := range licenses {
-			println("Path in main.go:", license.Path)
-		}
+		contextPath += "/" + arg.ConfigPath
 		config.AddLicensesToMap(licenses, contextPath)
+		println("")
 	}
 	arg.HandleArgs()
 
@@ -46,7 +44,9 @@ func findLicense(license args.License) string {
 		utils.HandleError(err)
 		return string(content)
 	}
-	return ""
+	b, err := os.ReadFile(license.File)
+	utils.HandleError(err)
+	return string(b)
 }
 
 func parseLicense(arg *args.Arguments, license string) string {
