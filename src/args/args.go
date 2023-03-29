@@ -14,6 +14,7 @@ type Arguments struct {
 	ConfigPath  string
 	Question    bool
 	Info        bool
+	InfoText    func() string
 }
 
 type License struct {

@@ -16,9 +16,6 @@ var staticContent embed.FS
 func main() {
 	args.GenerateLicenseMap()
 	arg := args.ParseCliArgs()
-	if arg.Info {
-		os.Exit(0)
-	}
 	// import custom licenses if needed
 	if arg.ConfigPath != "" {
 		licenses, err := config.GetLicenseConfigs(arg.ConfigPath)
@@ -29,6 +26,11 @@ func main() {
 		utils.ContextPath += "/"
 		config.AddLicensesToMap(licenses, arg.ConfigPath)
 		println("")
+	}
+	// show the info arguments and exist
+	if arg.Info {
+		println(arg.InfoText())
+		os.Exit(0)
 	}
 	arg.HandleArgs()
 

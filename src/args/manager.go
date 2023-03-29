@@ -22,7 +22,7 @@ ar:
 			continue
 		}
 		if arg == "-h" {
-			println(HelpArg.textGenerator())
+			arguments.InfoText = HelpArg.textGenerator
 			tb = true
 		}
 		for _, av := range argLists {
@@ -36,7 +36,7 @@ ar:
 			if arg != av.GenerateParameter() {
 				continue
 			}
-			println(av.textGenerator())
+			arguments.InfoText = av.textGenerator
 			l++
 			tb = true
 		}
