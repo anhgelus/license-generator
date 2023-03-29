@@ -28,9 +28,12 @@ func main() {
 }
 
 func findLicense(license args.License) string {
-	content, err := staticContent.ReadFile("resources/template/license/" + string(license))
-	utils.HandleError(err)
-	return string(content)
+	if license.File == "~" {
+		content, err := staticContent.ReadFile("resources/template/license/" + license.Name)
+		utils.HandleError(err)
+		return string(content)
+	}
+	return ""
 }
 
 func parseLicense(arg *args.Arguments, license string) string {

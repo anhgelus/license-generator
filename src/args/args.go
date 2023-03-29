@@ -14,21 +14,28 @@ type Arguments struct {
 	Info        bool
 }
 
-type License string
-
-const (
-	gpl     License = "GPLv3"
-	agpl    License = "AGPLv3"
-	lgpl    License = "LGPLv3"
-	mpl     License = "MPL"
-	mit     License = "MIT"
-	bsd     License = "BSD"
-	freebsd License = "FreeBSD"
-)
+type License struct {
+	Name string
+	File string
+}
 
 var (
-	licenseMap = make(map[string]License)
+	gpl        License = generateBasicLicense("GPLv3")
+	agpl       License = generateBasicLicense("AGPLv3")
+	lgpl       License = generateBasicLicense("LGPLv3")
+	mpl        License = generateBasicLicense("MPL")
+	mit        License = generateBasicLicense("MIT")
+	bsd        License = generateBasicLicense("BSD")
+	freebsd    License = generateBasicLicense("FreeBSD")
+	licenseMap         = make(map[string]License)
 )
+
+func generateBasicLicense(name string) License {
+	return License{
+		Name: name,
+		File: "~",
+	}
+}
 
 func GenerateLicenseMap() {
 	licenseMap["gpl"] = gpl
@@ -40,8 +47,13 @@ func GenerateLicenseMap() {
 	licenseMap["freebsd"] = freebsd
 }
 
-func GetLicense(name string) License {
-	return licenseMap[strings.ToLower(name)]
+func GetLicense(name string) (License, bool) {
+	lic, found := licenseMap[strings.ToLower(name)]
+	return lic, found
+}
+
+func AddLicense(license License, name string) {
+	licenseMap[name] = license
 }
 
 type AvailableArgument struct {
@@ -105,8 +117,8 @@ func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v stri
 	case "name":
 		arg.AppName = v
 	case "license":
-		license := GetLicense(v)
-		if license == "" {
+		license, found := GetLicense(v)
+		if !found {
 			return errors.New("invalid license type, available license type: " + mapLicenseToString(licenseMap))
 		}
 		arg.LicenseType = license
@@ -123,7 +135,7 @@ func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v stri
 func mapLicenseToString(m map[string]License) string {
 	str := ""
 	for _, license := range m {
-		str = str + ", " + string(license)
+		str = str + ", " + license.Name
 	}
 	return str
 }
