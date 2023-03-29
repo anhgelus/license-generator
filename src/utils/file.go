@@ -5,6 +5,10 @@ import (
 	"os"
 )
 
+var (
+	ContextPath string
+)
+
 func FileContent(path string, file os.DirEntry) []byte {
 	content, err := os.ReadFile(path + "/" + file.Name())
 	HandleError(err)

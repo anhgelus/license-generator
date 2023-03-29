@@ -23,10 +23,11 @@ func main() {
 	if arg.ConfigPath != "" {
 		licenses, err := config.GetLicenseConfigs(arg.ConfigPath)
 		utils.HandleError(err)
-		contextPath, err := os.Getwd()
+		// set the global context path
+		utils.ContextPath, err = os.Getwd()
 		utils.HandleError(err)
-		contextPath += "/" + arg.ConfigPath
-		config.AddLicensesToMap(licenses, contextPath)
+		utils.ContextPath += "/"
+		config.AddLicensesToMap(licenses, arg.ConfigPath)
 		println("")
 	}
 	arg.HandleArgs()

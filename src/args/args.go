@@ -2,6 +2,7 @@ package args
 
 import (
 	"errors"
+	"license-generator/src/utils"
 	"strings"
 )
 
@@ -133,7 +134,7 @@ func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v stri
 	case "authors":
 		arg.Authors = parseAuthors(v)
 	case "config-path":
-		arg.ConfigPath = v
+		arg.ConfigPath = utils.RelativeToAbsolute(v, utils.ContextPath)
 	default:
 		return errors.New("unknown argument, use -h to see every arguments")
 	}
