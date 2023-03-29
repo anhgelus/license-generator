@@ -10,6 +10,7 @@ type Arguments struct {
 	LicenseType License
 	Year        string
 	Authors     []string
+	ConfigPath  string
 	Question    bool
 	Info        bool
 }
@@ -89,12 +90,17 @@ var (
 		Description: "Set the authors of the project, separate them with the coma (,)",
 		Argument:    "[string,]",
 	}
+	ConfigPath = AvailableArgument{
+		Parameter:   "config-path",
+		Description: "Set a path to the config for using custom licenses",
+		Argument:    "string",
+	}
 	HelpArg = InfoArgument{
 		Parameter:     "h",
 		textGenerator: helpText,
 		Description:   "Show the help",
 	}
-	argLists     = [4]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg}
+	argLists     = [5]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg, ConfigPath}
 	infoArgLists = [0]InfoArgument{}
 )
 
@@ -126,6 +132,8 @@ func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v stri
 		arg.Year = v
 	case "authors":
 		arg.Authors = parseAuthors(v)
+	case "config-path":
+		arg.ConfigPath = v
 	default:
 		return errors.New("unknown argument, use -h to see every arguments")
 	}

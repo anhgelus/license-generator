@@ -38,31 +38,44 @@ func GetLicenseConfigs(path string) ([]LicenseConfig, error) {
 		content := utils.FileContent(path, file)
 		if file.Name() == "config.toml" {
 			utils.DecodeToml(content, &config)
+			println("Found the config.toml file")
 			continue
 		}
 		var license LicenseConfig
 		utils.DecodeToml(content, &license)
 		licenses[license.Identifier] = license
+		println("Imported", license.Name)
 	}
 	final := make([]LicenseConfig, len(licenses))
 	if len(config.ListConfig) == 0 {
-		for _, s := range config.ListConfig {
-			v, found := licenses[s]
-			if !found {
-				return nil, errors.New("the license with the identifier " + s + " was not found")
-			}
-			final = append(final, v)
+		i := 0
+		for _, licenseConfig := range licenses {
+			final[i] = licenseConfig
+			i++
 		}
+		return final, nil
+	}
+	i := 0
+	for _, s := range config.ListConfig {
+		v, found := licenses[s]
+		if !found {
+			return nil, errors.New("the license with the identifier " + s + " was not found")
+		}
+		final[i] = v
+		i++
 	}
 	return final, nil
 }
 
 func (license *LicenseConfig) AddToMap(contextPath string) {
+	println("Path:", license.Path)
 	args.AddLicense(license.ToLicense(contextPath), license.Identifier)
 }
 
 func AddLicensesToMap(licenses []LicenseConfig, contextPath string) {
+	println("F:", licenses[0].Path)
 	for _, license := range licenses {
+		println("P:", license.Path)
 		license.AddToMap(contextPath)
 	}
 }

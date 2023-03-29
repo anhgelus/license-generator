@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"license-generator/src/args"
+	"license-generator/src/config"
 	"license-generator/src/utils"
 	"os"
 	"strings"
@@ -17,6 +18,18 @@ func main() {
 	arg := args.ParseCliArgs()
 	if arg.Info {
 		os.Exit(0)
+	}
+	// import custom licenses if needed
+	if arg.ConfigPath != "" {
+		licenses, err := config.GetLicenseConfigs(arg.ConfigPath)
+		utils.HandleError(err)
+		contextPath, err := os.Getwd()
+		utils.HandleError(err)
+		println(contextPath)
+		for _, license := range licenses {
+			println("Path in main.go:", license.Path)
+		}
+		config.AddLicensesToMap(licenses, contextPath)
 	}
 	arg.HandleArgs()
 

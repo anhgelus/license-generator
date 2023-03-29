@@ -59,7 +59,7 @@ func (arg *Arguments) HandleArgs() {
 	}
 	m := make(map[string]string)
 	m["App Name"] = arg.AppName
-	m["License"] = string(arg.LicenseType)
+	m["License"] = arg.LicenseType.Name
 	m["Author(s)"] = utils.StringArrayToString(arg.Authors)
 	m["Year(s)"] = arg.Year
 	utils.GenerateSumeUp("Options", m, "-")
@@ -74,17 +74,17 @@ func (arg *Arguments) handleQuestion() {
 		println("The name is: " + name)
 		arg.AppName = name
 	}
-	if arg.LicenseType == "" {
+	if arg.LicenseType.Name == "" {
 		oldLicense := ""
 		print("License: ")
 		err := utils.Scan(&oldLicense)
 		utils.HandleError(err)
-		license := GetLicense(oldLicense)
-		if license == "" {
+		license, found := GetLicense(oldLicense)
+		if !found {
 			println("Unknown license type. Aborted.")
 			os.Exit(2)
 		}
-		println("The license is: " + license)
+		println("The license is: " + license.Name)
 		arg.LicenseType = license
 	}
 	if len(arg.Authors) == 0 {

@@ -22,6 +22,7 @@ func DecodeToml(content []byte, t any) {
 //
 // contextPath: the contextual path, with a slash (/) at the end
 func RelativeToAbsolute(path string, contextPath string) string {
+	println(path, contextPath)
 	switch string(path[0]) {
 	case "/":
 		return path
