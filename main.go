@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"license-generator/src/args"
+	"license-generator/src/config"
 	"license-generator/src/utils"
 	"os"
 	"strings"
@@ -18,6 +19,17 @@ func main() {
 	if arg.Info {
 		os.Exit(0)
 	}
+	// import custom licenses if needed
+	if arg.ConfigPath != "" {
+		licenses, err := config.GetLicenseConfigs(arg.ConfigPath)
+		utils.HandleError(err)
+		// set the global context path
+		utils.ContextPath, err = os.Getwd()
+		utils.HandleError(err)
+		utils.ContextPath += "/"
+		config.AddLicensesToMap(licenses, arg.ConfigPath)
+		println("")
+	}
 	arg.HandleArgs()
 
 	l := findLicense(arg.LicenseType)
@@ -28,9 +40,14 @@ func main() {
 }
 
 func findLicense(license args.License) string {
-	content, err := staticContent.ReadFile("resources/template/license/" + string(license))
+	if license.File == "~" {
+		content, err := staticContent.ReadFile("resources/template/license/" + license.Name)
+		utils.HandleError(err)
+		return string(content)
+	}
+	b, err := os.ReadFile(license.File)
 	utils.HandleError(err)
-	return string(content)
+	return string(b)
 }
 
 func parseLicense(arg *args.Arguments, license string) string {

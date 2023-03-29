@@ -2,6 +2,7 @@ package args
 
 import (
 	"errors"
+	"license-generator/src/utils"
 	"strings"
 )
 
@@ -10,25 +11,33 @@ type Arguments struct {
 	LicenseType License
 	Year        string
 	Authors     []string
+	ConfigPath  string
 	Question    bool
 	Info        bool
 }
 
-type License string
-
-const (
-	gpl     License = "GPLv3"
-	agpl    License = "AGPLv3"
-	lgpl    License = "LGPLv3"
-	mpl     License = "MPL"
-	mit     License = "MIT"
-	bsd     License = "BSD"
-	freebsd License = "FreeBSD"
-)
+type License struct {
+	Name string
+	File string
+}
 
 var (
-	licenseMap = make(map[string]License)
+	gpl        License = generateBasicLicense("GPLv3")
+	agpl       License = generateBasicLicense("AGPLv3")
+	lgpl       License = generateBasicLicense("LGPLv3")
+	mpl        License = generateBasicLicense("MPL")
+	mit        License = generateBasicLicense("MIT")
+	bsd        License = generateBasicLicense("BSD")
+	freebsd    License = generateBasicLicense("FreeBSD")
+	licenseMap         = make(map[string]License)
 )
+
+func generateBasicLicense(name string) License {
+	return License{
+		Name: name,
+		File: "~",
+	}
+}
 
 func GenerateLicenseMap() {
 	licenseMap["gpl"] = gpl
@@ -40,8 +49,13 @@ func GenerateLicenseMap() {
 	licenseMap["freebsd"] = freebsd
 }
 
-func GetLicense(name string) License {
-	return licenseMap[strings.ToLower(name)]
+func GetLicense(name string) (License, bool) {
+	lic, found := licenseMap[strings.ToLower(name)]
+	return lic, found
+}
+
+func AddLicense(license License, name string) {
+	licenseMap[name] = license
 }
 
 type AvailableArgument struct {
@@ -77,12 +91,17 @@ var (
 		Description: "Set the authors of the project, separate them with the coma (,)",
 		Argument:    "[string,]",
 	}
+	ConfigPath = AvailableArgument{
+		Parameter:   "config-path",
+		Description: "Set a path to the config for using custom licenses",
+		Argument:    "string",
+	}
 	HelpArg = InfoArgument{
 		Parameter:     "h",
 		textGenerator: helpText,
 		Description:   "Show the help",
 	}
-	argLists     = [4]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg}
+	argLists     = [5]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg, ConfigPath}
 	infoArgLists = [0]InfoArgument{}
 )
 
@@ -105,8 +124,8 @@ func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v stri
 	case "name":
 		arg.AppName = v
 	case "license":
-		license := GetLicense(v)
-		if license == "" {
+		license, found := GetLicense(v)
+		if !found {
 			return errors.New("invalid license type, available license type: " + mapLicenseToString(licenseMap))
 		}
 		arg.LicenseType = license
@@ -114,6 +133,8 @@ func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v stri
 		arg.Year = v
 	case "authors":
 		arg.Authors = parseAuthors(v)
+	case "config-path":
+		arg.ConfigPath = utils.RelativeToAbsolute(v, utils.ContextPath)
 	default:
 		return errors.New("unknown argument, use -h to see every arguments")
 	}
@@ -123,7 +144,7 @@ func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v stri
 func mapLicenseToString(m map[string]License) string {
 	str := ""
 	for _, license := range m {
-		str = str + ", " + string(license)
+		str = str + ", " + license.Name
 	}
 	return str
 }
