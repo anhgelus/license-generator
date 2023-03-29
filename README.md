@@ -41,7 +41,8 @@ To create a new license, just run `license-generator` and answer every question.
 The first question is the name of your application. Here it's *license-generator*: this is basically the name of the project.
 
 Then, it will ask you each license do you want to use. Answer with the identifier of the license. For example, it's `gpl` *for GPLv3*.
-When the `0.3.0` will be available, a new argument will show you every available identifier.
+
+To check every available license, use `license-generator -l`.
 
 Next, just answer with the authors of the program and separate each with a coma (,) if there are more than one author.
 

@@ -101,8 +101,13 @@ var (
 		textGenerator: helpText,
 		Description:   "Show the help",
 	}
+	LicenseListArg = InfoArgument{
+		Parameter:     "l",
+		textGenerator: listLicense,
+		Description:   "List every available license",
+	}
 	argLists     = [5]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg, ConfigPath}
-	infoArgLists = [0]InfoArgument{}
+	infoArgLists = [1]InfoArgument{LicenseListArg}
 )
 
 // GenerateParameter Generate the full parameter
@@ -156,11 +161,19 @@ func parseAuthors(s string) []string {
 func helpText() string {
 	str := ""
 	for _, arg := range argLists {
-		str = str + arg.GenerateParameter() + " " + arg.Argument + " - " + arg.Description + "\n"
+		str += arg.GenerateParameter() + " " + arg.Argument + " - " + arg.Description + "\n"
 	}
 	for _, arg := range infoArgLists {
-		str = str + arg.GenerateParameter() + " - " + arg.Description + "\n"
+		str += arg.GenerateParameter() + " - " + arg.Description + "\n"
 	}
 	str = str + "-h - Show the help"
 	return str
+}
+
+func listLicense() string {
+	str := ""
+	for id, license := range licenseMap {
+		str += "- " + license.Name + " (" + id + ")\n"
+	}
+	return str[:len(str)-1]
 }
