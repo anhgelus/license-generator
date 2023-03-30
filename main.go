@@ -14,16 +14,20 @@ import (
 var staticContent embed.FS
 
 func main() {
+	// generate the base
 	args.GenerateLicenseMap()
+	// set the global context path
+	var err error
+	utils.ContextPath, err = os.Getwd()
+	utils.HandleError(err)
+	utils.ContextPath += "/"
+
+	// parse args
 	arg := args.ParseCliArgs()
 	// import custom licenses if needed
 	if arg.ConfigPath != "" {
 		licenses, err := config.GetLicenseConfigs(arg.ConfigPath)
 		utils.HandleError(err)
-		// set the global context path
-		utils.ContextPath, err = os.Getwd()
-		utils.HandleError(err)
-		utils.ContextPath += "/"
 		config.AddLicensesToMap(licenses, arg.ConfigPath)
 		println("")
 	}
@@ -36,7 +40,7 @@ func main() {
 
 	l := findLicense(arg.LicenseType)
 	file := parseLicense(arg, l)
-	err := os.WriteFile("LICENSE", []byte(file), 0666)
+	err = os.WriteFile("LICENSE", []byte(file), 0666)
 	utils.HandleError(err)
 	println("The LICENSE was successfully created!")
 }
