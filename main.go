@@ -3,7 +3,6 @@ package main
 import (
 	"embed"
 	"license-generator/src/args"
-	"license-generator/src/config"
 	"license-generator/src/utils"
 	"os"
 	"strings"
@@ -25,12 +24,12 @@ func main() {
 	// parse args
 	arg := args.ParseCliArgs()
 	// import custom licenses if needed
-	if arg.ConfigPath != "" {
-		licenses, err := config.GetLicenseConfigs(arg.ConfigPath)
-		utils.HandleError(err)
-		config.AddLicensesToMap(licenses, arg.ConfigPath)
-		println("")
-	}
+	//if arg.ConfigPath != "" {
+	//	licenses, err := config.GetLicenseConfigs(arg.ConfigPath)
+	//	utils.HandleError(err)
+	//		config.AddLicensesToMap(licenses, arg.ConfigPath)
+	//	println("")
+	//}
 	// show the info arguments and exist
 	if arg.Info {
 		println(arg.InfoText())
