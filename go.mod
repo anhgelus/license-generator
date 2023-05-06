@@ -1,4 +1,4 @@
-module license-generator
+module github.com/anhgelus/license-generator
 
 go 1.19
 
