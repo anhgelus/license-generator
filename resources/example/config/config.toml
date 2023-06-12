@@ -1,1 +1,2 @@
 customLicenses = ["cc0"]
+pathToLicenses = "./license"
