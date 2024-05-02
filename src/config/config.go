@@ -41,7 +41,9 @@ func GetLicenseConfigs(path string) ([]*LicenseConfig, error) {
 		}
 		content := utils.FileContent(path, file)
 		utils.DecodeToml(content, &config)
-		println("Found the config.toml file")
+		if args.Verbose {
+			println("Found the config.toml file")
+		}
 		found = true
 	}
 	if !found {
@@ -71,7 +73,9 @@ func (config *MainConfig) parseLicensesFile(path string) ([]*LicenseConfig, erro
 		var license LicenseConfig
 		utils.DecodeToml(content, &license)
 		licenses = append(licenses, &license)
-		fmt.Printf("Imported %s (%s)\n", license.Name, license.Identifier)
+		if args.Verbose {
+			fmt.Printf("Imported %s (%s)\n", license.Name, license.Identifier)
+		}
 	}
 	AddLicensesToMap(licenses, path+"/")
 	return licenses, nil

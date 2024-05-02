@@ -32,6 +32,7 @@ func init() {
 	)
 	flag.BoolVar(&args.List, "l", false, "List every available license")
 	flag.BoolVar(&args.Help, "h", false, "Show the help")
+	flag.BoolVar(&args.Verbose, "v", false, "Verbose")
 }
 
 func main() {
@@ -40,6 +41,8 @@ func main() {
 	utils.ContextPath, err = os.Getwd()
 	utils.HandleError(err)
 	utils.ContextPath += "/"
+
+	flag.Parse()
 
 	// import the basic config
 	_, err = config.ImportStaticConfig()
@@ -54,7 +57,9 @@ func main() {
 		l, err := config.GetLicenseConfigs(arg.ConfigPath)
 		utils.HandleError(err)
 		config.AddLicensesToMap(l, arg.ConfigPath)
-		println("")
+		if args.Verbose {
+			println("")
+		}
 	}
 
 	// show the info arguments and exist

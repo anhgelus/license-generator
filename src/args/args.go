@@ -69,6 +69,11 @@ type InfoArgument struct {
 	Description   string
 }
 
+type OtherArgument struct {
+	Parameter   string
+	Description string
+}
+
 var (
 	AppNameArg = AvailableArgument{
 		Parameter:   "name",
@@ -105,20 +110,29 @@ var (
 		textGenerator: listLicense,
 		Description:   "List every available license",
 	}
-	argLists     = [5]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg, ConfigPath}
-	infoArgLists = [1]InfoArgument{LicenseListArg}
+	VerboseArg = OtherArgument{
+		Parameter:   "v",
+		Description: "Verbose mode",
+	}
+	argLists      = [5]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg, ConfigPath}
+	infoArgLists  = [1]InfoArgument{LicenseListArg}
+	otherArgLists = [1]OtherArgument{VerboseArg}
 )
 
 // GenerateParameter Generate the full parameter
-func (arg AvailableArgument) GenerateParameter() string {
+func (arg *AvailableArgument) GenerateParameter() string {
 	return "--" + arg.Parameter
 }
 
-func (arg InfoArgument) GenerateParameter() string {
+func (arg *InfoArgument) GenerateParameter() string {
 	return "-" + arg.Parameter
 }
 
-func (arg InfoArgument) GenerateText() string {
+func (arg *OtherArgument) GenerateParameter() string {
+	return "-" + arg.Parameter
+}
+
+func (arg *InfoArgument) GenerateText() string {
 	return arg.textGenerator()
 }
 
@@ -136,6 +150,9 @@ func helpText() string {
 		str += arg.GenerateParameter() + " " + arg.Argument + " - " + arg.Description + "\n"
 	}
 	for _, arg := range infoArgLists {
+		str += arg.GenerateParameter() + " - " + arg.Description + "\n"
+	}
+	for _, arg := range otherArgLists {
 		str += arg.GenerateParameter() + " - " + arg.Description + "\n"
 	}
 	str = str + "-h - Show the help"

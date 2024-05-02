@@ -1,7 +1,6 @@
 package args
 
 import (
-	"flag"
 	"github.com/anhgelus/license-generator/src/utils"
 	"os"
 )
@@ -14,10 +13,10 @@ var (
 	CustomConfigPath string
 	Help             bool
 	List             bool
+	Verbose          bool
 )
 
 func ParseCliArgs() *Arguments {
-	flag.Parse()
 	// if the user don't give basic information through args
 	if len(os.Args) < 2 {
 		return &Arguments{Question: true}
