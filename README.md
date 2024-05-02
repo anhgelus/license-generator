@@ -19,7 +19,7 @@ $ export PATH=${PATH}:`go env GOPATH`/bin
 
 ## Build
 
-To build this application, you need Go 1.19
+To build this application, you need Go 1.22
 
 First of all, install every dependency
 
@@ -109,4 +109,4 @@ When the program will ask you wich license do you want to use, just use the iden
 
 ## Technologies
 
-- Go 1.19
+- Go 1.22
