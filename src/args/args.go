@@ -6,7 +6,7 @@ import (
 
 type Arguments struct {
 	AppName     string
-	LicenseType License
+	LicenseType *License
 	Years       string
 	Authors     []string
 	ConfigPath  string
@@ -28,8 +28,18 @@ var (
 	mit        = generateBasicLicense("MIT")
 	bsd        = generateBasicLicense("BSD")
 	freebsd    = generateBasicLicense("FreeBSD")
-	licenseMap = make(map[string]License)
+	licenseMap = make(map[string]*License)
 )
+
+func init() {
+	licenseMap["gpl"] = &gpl
+	licenseMap["agpl"] = &agpl
+	licenseMap["lgpl"] = &lgpl
+	licenseMap["mpl"] = &mpl
+	licenseMap["mit"] = &mit
+	licenseMap["bsd"] = &bsd
+	licenseMap["freebsd"] = &freebsd
+}
 
 func generateBasicLicense(name string) License {
 	return License{
@@ -38,22 +48,12 @@ func generateBasicLicense(name string) License {
 	}
 }
 
-func init() {
-	licenseMap["gpl"] = gpl
-	licenseMap["agpl"] = agpl
-	licenseMap["lgpl"] = lgpl
-	licenseMap["mpl"] = mpl
-	licenseMap["mit"] = mit
-	licenseMap["bsd"] = bsd
-	licenseMap["freebsd"] = freebsd
-}
-
-func GetLicense(name string) (License, bool) {
+func GetLicense(name string) (*License, bool) {
 	lic, found := licenseMap[strings.ToLower(name)]
 	return lic, found
 }
 
-func AddLicense(license License, name string) {
+func AddLicense(license *License, name string) {
 	licenseMap[name] = license
 }
 

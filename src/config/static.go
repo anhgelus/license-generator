@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func ImportStaticConfig() (*[]*LicenseConfig, error) {
+func ImportStaticConfig() ([]*LicenseConfig, error) {
 	dirPath, err := os.UserHomeDir()
 	utils.HandleError(err)
 	configPath := dirPath + "/.config/license-generator/"
@@ -14,7 +14,6 @@ func ImportStaticConfig() (*[]*LicenseConfig, error) {
 	if err != nil && !errors.Is(err, os.ErrExist) {
 		return nil, err
 	}
-	l := new([]*LicenseConfig)
-	err = GetLicenseConfigs(configPath, l)
+	l, err := GetLicenseConfigs(configPath)
 	return l, err
 }

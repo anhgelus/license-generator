@@ -42,19 +42,18 @@ func main() {
 	utils.ContextPath += "/"
 
 	// import the basic config
-	licenses, err := config.ImportStaticConfig()
+	_, err = config.ImportStaticConfig()
 	if err != nil {
 		println(err.Error())
-		licenses = &[]*config.LicenseConfig{}
 	}
 
 	// parse args
 	arg := args.ParseCliArgs()
 	// import custom licenses if needed
 	if arg.ConfigPath != "" {
-		err = config.GetLicenseConfigs(arg.ConfigPath, licenses)
+		l, err := config.GetLicenseConfigs(arg.ConfigPath)
 		utils.HandleError(err)
-		config.AddLicensesToMap(licenses, arg.ConfigPath)
+		config.AddLicensesToMap(l, arg.ConfigPath)
 		println("")
 	}
 
@@ -73,7 +72,7 @@ func main() {
 	println("The LICENSE was successfully created!")
 }
 
-func findLicense(license args.License) string {
+func findLicense(license *args.License) string {
 	if license.File == "~" {
 		content, err := staticContent.ReadFile("resources/template/license/" + license.Name)
 		utils.HandleError(err)

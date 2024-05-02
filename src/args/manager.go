@@ -35,7 +35,7 @@ func ParseCliArgs() *Arguments {
 	}
 
 	arguments.AppName = Name
-	arguments.LicenseType.Name = LicenseSelected
+	arguments.LicenseType = &License{Name: LicenseSelected}
 	arguments.Authors = parseAuthors(Authors)
 	arguments.Years = Years
 	arguments.Question = len(Name) == 0 || len(Years) == 0 || len(Authors) == 0 || len(LicenseSelected) == 0
@@ -63,7 +63,7 @@ func (arg *Arguments) handleQuestion() {
 		utils.HandleError(err)
 		arg.AppName = name
 	}
-	if arg.LicenseType.Name == "" {
+	if arg.LicenseType == nil || arg.LicenseType.Name == "" {
 		oldLicense := ""
 		print("License: ")
 		err := utils.Scan(&oldLicense)
