@@ -3,8 +3,8 @@ package config
 import (
 	"errors"
 	"fmt"
-	"license-generator/src/args"
-	"license-generator/src/utils"
+	"github.com/anhgelus/license-generator/src/args"
+	"github.com/anhgelus/license-generator/src/utils"
 	"os"
 	"regexp"
 )

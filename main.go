@@ -2,9 +2,9 @@ package main
 
 import (
 	"embed"
-	"license-generator/src/args"
-	"license-generator/src/config"
-	"license-generator/src/utils"
+	"github.com/anhgelus/license-generator/src/args"
+	"github.com/anhgelus/license-generator/src/config"
+	"github.com/anhgelus/license-generator/src/utils"
 	"os"
 	"strings"
 	"text/template"

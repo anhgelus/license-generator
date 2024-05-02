@@ -1,7 +1,7 @@
 package args
 
 import (
-	"license-generator/src/utils"
+	"github.com/anhgelus/license-generator/src/utils"
 	"os"
 	"strings"
 )

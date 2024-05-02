@@ -2,7 +2,7 @@ package args
 
 import (
 	"errors"
-	"license-generator/src/utils"
+	"github.com/anhgelus/license-generator/src/utils"
 	"strings"
 )
 
