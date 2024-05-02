@@ -1,15 +1,13 @@
 package args
 
 import (
-	"errors"
-	"github.com/anhgelus/license-generator/src/utils"
 	"strings"
 )
 
 type Arguments struct {
 	AppName     string
 	LicenseType License
-	Year        string
+	Years       string
 	Authors     []string
 	ConfigPath  string
 	Question    bool
@@ -23,14 +21,14 @@ type License struct {
 }
 
 var (
-	gpl        License = generateBasicLicense("GPLv3")
-	agpl       License = generateBasicLicense("AGPLv3")
-	lgpl       License = generateBasicLicense("LGPLv3")
-	mpl        License = generateBasicLicense("MPL")
-	mit        License = generateBasicLicense("MIT")
-	bsd        License = generateBasicLicense("BSD")
-	freebsd    License = generateBasicLicense("FreeBSD")
-	licenseMap         = make(map[string]License)
+	gpl        = generateBasicLicense("GPLv3")
+	agpl       = generateBasicLicense("AGPLv3")
+	lgpl       = generateBasicLicense("LGPLv3")
+	mpl        = generateBasicLicense("MPL")
+	mit        = generateBasicLicense("MIT")
+	bsd        = generateBasicLicense("BSD")
+	freebsd    = generateBasicLicense("FreeBSD")
+	licenseMap = make(map[string]License)
 )
 
 func generateBasicLicense(name string) License {
@@ -40,7 +38,7 @@ func generateBasicLicense(name string) License {
 	}
 }
 
-func GenerateLicenseMap() {
+func init() {
 	licenseMap["gpl"] = gpl
 	licenseMap["agpl"] = agpl
 	licenseMap["lgpl"] = lgpl
@@ -124,39 +122,12 @@ func (arg InfoArgument) GenerateText() string {
 	return arg.textGenerator()
 }
 
-// AssignValueToArguments Assign the value of the argument passed through the cli inside the Arguments struct
-func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v string) error {
-	switch argument.Parameter {
-	case "name":
-		arg.AppName = v
-	case "license":
-		license, found := GetLicense(v)
-		if !found {
-			return errors.New("invalid license type, available license type: " + mapLicenseToString(licenseMap))
-		}
-		arg.LicenseType = license
-	case "year":
-		arg.Year = v
-	case "authors":
-		arg.Authors = parseAuthors(v)
-	case "config-path":
-		arg.ConfigPath = utils.RelativeToAbsolute(v, utils.ContextPath)
-	default:
-		return errors.New("unknown argument, use -h to see every arguments")
-	}
-	return nil
-}
-
-func mapLicenseToString(m map[string]License) string {
-	str := ""
-	for _, license := range m {
-		str = str + ", " + license.Name
-	}
-	return str
-}
-
 func parseAuthors(s string) []string {
-	return strings.Split(s, ",")
+	var authors []string
+	for _, a := range strings.Split(s, ",") {
+		authors = append(authors, strings.Trim(a, " "))
+	}
+	return authors
 }
 
 func helpText() string {

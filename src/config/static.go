@@ -1,9 +1,9 @@
 package config
 
 import (
-	"license-generator/src/utils"
-	"os"
 	"errors"
+	"github.com/anhgelus/license-generator/src/utils"
+	"os"
 )
 
 func ImportStaticConfig() (*[]*LicenseConfig, error) {

@@ -1,56 +1,46 @@
 package args
 
 import (
+	"flag"
 	"github.com/anhgelus/license-generator/src/utils"
 	"os"
-	"strings"
+)
+
+var (
+	Name             string
+	LicenseSelected  string
+	Authors          string
+	Years            string
+	CustomConfigPath string
+	Help             bool
+	List             bool
 )
 
 func ParseCliArgs() *Arguments {
-	args := os.Args
+	flag.Parse()
 	// if the user don't give basic information through args
-	if len(args) < 2 {
+	if len(os.Args) < 2 {
 		return &Arguments{Question: true}
 	}
-	arguments := Arguments{Info: false}
-	l := 0
-	tb := false
+	arguments := &Arguments{Info: false}
 
-ar:
-	for i, arg := range args {
-		if i == 0 {
-			continue
-		}
-		if arg == "-h" {
-			arguments.InfoText = HelpArg.textGenerator
-			tb = true
-		}
-		for _, av := range argLists {
-			if arg != av.GenerateParameter() {
-				continue
-			}
-			arguments.assignValueToArguments(&av, args[i+1])
-			l++
-		}
-		for _, av := range infoArgLists {
-			if arg != av.GenerateParameter() {
-				continue
-			}
-			arguments.InfoText = av.textGenerator
-			l++
-			tb = true
-		}
-		if tb {
-			break ar
-		}
-	}
-	if l != 4 {
-		arguments.Question = true
-	}
-	if tb {
+	if Help || List {
 		arguments.Info = true
+		if Help {
+			arguments.InfoText = HelpArg.textGenerator
+		} else if List {
+			arguments.InfoText = LicenseListArg.textGenerator
+		}
+		return arguments
 	}
-	return &arguments
+
+	arguments.AppName = Name
+	arguments.LicenseType.Name = LicenseSelected
+	arguments.Authors = parseAuthors(Authors)
+	arguments.Years = Years
+	arguments.Question = len(Name) == 0 || len(Years) == 0 || len(Authors) == 0 || len(LicenseSelected) == 0
+
+	return arguments
 }
 
 func (arg *Arguments) HandleArgs() {
@@ -61,7 +51,7 @@ func (arg *Arguments) HandleArgs() {
 	m["App Name"] = arg.AppName
 	m["License"] = arg.LicenseType.Name
 	m["Author(s)"] = utils.StringArrayToString(arg.Authors)
-	m["Year(s)"] = arg.Year
+	m["Years(s)"] = arg.Years
 	utils.GenerateSumeUp("Options", m, "-")
 }
 
@@ -71,7 +61,6 @@ func (arg *Arguments) handleQuestion() {
 		print("Name of the application: ")
 		err := utils.Scan(&name)
 		utils.HandleError(err)
-		println("The name is: " + name)
 		arg.AppName = name
 	}
 	if arg.LicenseType.Name == "" {
@@ -81,10 +70,10 @@ func (arg *Arguments) handleQuestion() {
 		utils.HandleError(err)
 		license, found := GetLicense(oldLicense)
 		if !found {
-			println("Unknown license type. Aborted.")
-			os.Exit(2)
+			println("Unknown license type. Check available licenses with -l.")
+			os.Exit(1)
 		}
-		println("The license is: " + license.Name)
+		println("License found: " + license.Name)
 		arg.LicenseType = license
 	}
 	if len(arg.Authors) == 0 {
@@ -92,15 +81,13 @@ func (arg *Arguments) handleQuestion() {
 		print("Author(s) of this program (separate each author with a coma (,)): ")
 		err := utils.Scan(&unparsedAuthor)
 		utils.HandleError(err)
-		println("Authors: " + strings.ReplaceAll(unparsedAuthor, ",", ", "))
 		arg.Authors = parseAuthors(unparsedAuthor)
 	}
-	if arg.Year == "" {
+	if arg.Years == "" {
 		year := ""
-		print("Year of the copyright: ")
+		print("Years of the copyright: ")
 		err := utils.Scan(&year)
 		utils.HandleError(err)
-		println("The year is: " + year)
-		arg.Year = year
+		arg.Years = year
 	}
 }
