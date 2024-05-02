@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"license-generator/src/args"
+	"license-generator/src/config"
 	"license-generator/src/utils"
 	"os"
 	"strings"
@@ -21,15 +22,22 @@ func main() {
 	utils.HandleError(err)
 	utils.ContextPath += "/"
 
+	// import the basic config
+	licenses, err := config.ImportStaticConfig()
+	if err != nil {
+		println(err.Error())
+		licenses = &[]*config.LicenseConfig{}
+	}
+
 	// parse args
 	arg := args.ParseCliArgs()
 	// import custom licenses if needed
-	//if arg.ConfigPath != "" {
-	//	licenses, err := config.GetLicenseConfigs(arg.ConfigPath)
-	//	utils.HandleError(err)
-	//		config.AddLicensesToMap(licenses, arg.ConfigPath)
-	//	println("")
-	//}
+	if arg.ConfigPath != "" {
+		err = config.GetLicenseConfigs(arg.ConfigPath, licenses)
+		utils.HandleError(err)
+		config.AddLicensesToMap(licenses, arg.ConfigPath)
+		println("")
+	}
 	// show the info arguments and exist
 	if arg.Info {
 		println(arg.InfoText())
@@ -39,7 +47,7 @@ func main() {
 
 	l := findLicense(arg.LicenseType)
 	file := parseLicense(arg, l)
-	err = os.WriteFile("LICENSE", []byte(file), 0666)
+	err = os.WriteFile("LICENSE", []byte(file), 0766)
 	utils.HandleError(err)
 	println("The LICENSE was successfully created!")
 }
