@@ -4,7 +4,7 @@ License generator is a cli application helping to generate the `LICENSE` file fo
 
 ## Installation
 
-To install the application, you need Go 1.19.
+To install the application, you need Go 1.22.
 
 And run this command to install it:
 ```bash

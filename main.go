@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"flag"
 	"github.com/anhgelus/license-generator/src/args"
 	"github.com/anhgelus/license-generator/src/config"
 	"github.com/anhgelus/license-generator/src/utils"
@@ -13,36 +14,60 @@ import (
 //go:embed resources/template/license
 var staticContent embed.FS
 
+func init() {
+	flag.StringVar(&args.Name, "name", "", "Set the name of the project")
+	flag.StringVar(&args.LicenseSelected, "license", "", "Set the license of the project\"")
+	flag.StringVar(&args.Years, "years", "", "Set the year")
+	flag.StringVar(
+		&args.Authors,
+		"authors",
+		"",
+		"Set the authors of the project, separate them with the coma (,)",
+	)
+	flag.StringVar(
+		&args.CustomConfigPath,
+		"config-path",
+		"",
+		"Set the path to the config to use custom licenses",
+	)
+	flag.BoolVar(&args.List, "l", false, "List every available license")
+	flag.BoolVar(&args.Help, "h", false, "Show the help")
+	flag.BoolVar(&args.Verbose, "v", false, "Verbose")
+}
+
 func main() {
-	// generate the base
-	args.GenerateLicenseMap()
 	// set the global context path
 	var err error
 	utils.ContextPath, err = os.Getwd()
 	utils.HandleError(err)
 	utils.ContextPath += "/"
 
+	flag.Parse()
+
 	// import the basic config
-	licenses, err := config.ImportStaticConfig()
+	_, err = config.ImportStaticConfig()
 	if err != nil {
 		println(err.Error())
-		licenses = &[]*config.LicenseConfig{}
 	}
 
 	// parse args
 	arg := args.ParseCliArgs()
 	// import custom licenses if needed
 	if arg.ConfigPath != "" {
-		err = config.GetLicenseConfigs(arg.ConfigPath, licenses)
+		l, err := config.GetLicenseConfigs(arg.ConfigPath)
 		utils.HandleError(err)
-		config.AddLicensesToMap(licenses, arg.ConfigPath)
-		println("")
+		config.AddLicensesToMap(l, arg.ConfigPath)
+		if args.Verbose {
+			println("")
+		}
 	}
+
 	// show the info arguments and exist
 	if arg.Info {
 		println(arg.InfoText())
 		os.Exit(0)
 	}
+
 	arg.HandleArgs()
 
 	l := findLicense(arg.LicenseType)
@@ -52,7 +77,7 @@ func main() {
 	println("The LICENSE was successfully created!")
 }
 
-func findLicense(license args.License) string {
+func findLicense(license *args.License) string {
 	if license.File == "~" {
 		content, err := staticContent.ReadFile("resources/template/license/" + license.Name)
 		utils.HandleError(err)
@@ -69,7 +94,7 @@ func parseLicense(arg *args.Arguments, license string) string {
 
 	tempWriter := new(strings.Builder)
 	err = t.Execute(tempWriter, map[string]interface{}{
-		"Year":    arg.Year,
+		"Years":   arg.Years,
 		"Authors": utils.StringArrayToString(arg.Authors),
 		"AppName": arg.AppName,
 	})

@@ -1,15 +1,13 @@
 package args
 
 import (
-	"errors"
-	"github.com/anhgelus/license-generator/src/utils"
 	"strings"
 )
 
 type Arguments struct {
 	AppName     string
-	LicenseType License
-	Year        string
+	LicenseType *License
+	Years       string
 	Authors     []string
 	ConfigPath  string
 	Question    bool
@@ -23,15 +21,25 @@ type License struct {
 }
 
 var (
-	gpl        License = generateBasicLicense("GPLv3")
-	agpl       License = generateBasicLicense("AGPLv3")
-	lgpl       License = generateBasicLicense("LGPLv3")
-	mpl        License = generateBasicLicense("MPL")
-	mit        License = generateBasicLicense("MIT")
-	bsd        License = generateBasicLicense("BSD")
-	freebsd    License = generateBasicLicense("FreeBSD")
-	licenseMap         = make(map[string]License)
+	gpl        = generateBasicLicense("GPLv3")
+	agpl       = generateBasicLicense("AGPLv3")
+	lgpl       = generateBasicLicense("LGPLv3")
+	mpl        = generateBasicLicense("MPL")
+	mit        = generateBasicLicense("MIT")
+	bsd        = generateBasicLicense("BSD")
+	freebsd    = generateBasicLicense("FreeBSD")
+	licenseMap = make(map[string]*License)
 )
+
+func init() {
+	licenseMap["gpl"] = &gpl
+	licenseMap["agpl"] = &agpl
+	licenseMap["lgpl"] = &lgpl
+	licenseMap["mpl"] = &mpl
+	licenseMap["mit"] = &mit
+	licenseMap["bsd"] = &bsd
+	licenseMap["freebsd"] = &freebsd
+}
 
 func generateBasicLicense(name string) License {
 	return License{
@@ -40,22 +48,12 @@ func generateBasicLicense(name string) License {
 	}
 }
 
-func GenerateLicenseMap() {
-	licenseMap["gpl"] = gpl
-	licenseMap["agpl"] = agpl
-	licenseMap["lgpl"] = lgpl
-	licenseMap["mpl"] = mpl
-	licenseMap["mit"] = mit
-	licenseMap["bsd"] = bsd
-	licenseMap["freebsd"] = freebsd
-}
-
-func GetLicense(name string) (License, bool) {
+func GetLicense(name string) (*License, bool) {
 	lic, found := licenseMap[strings.ToLower(name)]
 	return lic, found
 }
 
-func AddLicense(license License, name string) {
+func AddLicense(license *License, name string) {
 	licenseMap[name] = license
 }
 
@@ -69,6 +67,11 @@ type InfoArgument struct {
 	Parameter     string
 	textGenerator func() string
 	Description   string
+}
+
+type OtherArgument struct {
+	Parameter   string
+	Description string
 }
 
 var (
@@ -107,56 +110,38 @@ var (
 		textGenerator: listLicense,
 		Description:   "List every available license",
 	}
-	argLists     = [5]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg, ConfigPath}
-	infoArgLists = [1]InfoArgument{LicenseListArg}
+	VerboseArg = OtherArgument{
+		Parameter:   "v",
+		Description: "Verbose mode",
+	}
+	argLists      = [5]AvailableArgument{AppNameArg, LicenseArg, YearArg, AuthorsArg, ConfigPath}
+	infoArgLists  = [1]InfoArgument{LicenseListArg}
+	otherArgLists = [1]OtherArgument{VerboseArg}
 )
 
 // GenerateParameter Generate the full parameter
-func (arg AvailableArgument) GenerateParameter() string {
+func (arg *AvailableArgument) GenerateParameter() string {
 	return "--" + arg.Parameter
 }
 
-func (arg InfoArgument) GenerateParameter() string {
+func (arg *InfoArgument) GenerateParameter() string {
 	return "-" + arg.Parameter
 }
 
-func (arg InfoArgument) GenerateText() string {
+func (arg *OtherArgument) GenerateParameter() string {
+	return "-" + arg.Parameter
+}
+
+func (arg *InfoArgument) GenerateText() string {
 	return arg.textGenerator()
 }
 
-// AssignValueToArguments Assign the value of the argument passed through the cli inside the Arguments struct
-func (arg *Arguments) assignValueToArguments(argument *AvailableArgument, v string) error {
-	switch argument.Parameter {
-	case "name":
-		arg.AppName = v
-	case "license":
-		license, found := GetLicense(v)
-		if !found {
-			return errors.New("invalid license type, available license type: " + mapLicenseToString(licenseMap))
-		}
-		arg.LicenseType = license
-	case "year":
-		arg.Year = v
-	case "authors":
-		arg.Authors = parseAuthors(v)
-	case "config-path":
-		arg.ConfigPath = utils.RelativeToAbsolute(v, utils.ContextPath)
-	default:
-		return errors.New("unknown argument, use -h to see every arguments")
-	}
-	return nil
-}
-
-func mapLicenseToString(m map[string]License) string {
-	str := ""
-	for _, license := range m {
-		str = str + ", " + license.Name
-	}
-	return str
-}
-
 func parseAuthors(s string) []string {
-	return strings.Split(s, ",")
+	var authors []string
+	for _, a := range strings.Split(s, ",") {
+		authors = append(authors, strings.Trim(a, " "))
+	}
+	return authors
 }
 
 func helpText() string {
@@ -165,6 +150,9 @@ func helpText() string {
 		str += arg.GenerateParameter() + " " + arg.Argument + " - " + arg.Description + "\n"
 	}
 	for _, arg := range infoArgLists {
+		str += arg.GenerateParameter() + " - " + arg.Description + "\n"
+	}
+	for _, arg := range otherArgLists {
 		str += arg.GenerateParameter() + " - " + arg.Description + "\n"
 	}
 	str = str + "-h - Show the help"
