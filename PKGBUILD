@@ -1,3 +1,5 @@
+# Maintainer: William Hergès <me@anhgelus.world>
+# Contributor:  Léo-21 <leo.kosman@proton.me>
 pkgname="license-generator"
 pkgver="1.0.1"
 pkgrel="1"
